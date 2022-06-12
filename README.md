@@ -1,4 +1,4 @@
-# Team Projcet in YearDream 2nd-year: Kaggle Competition IEEE-CIS Fraud Detection
+# Team Projcet in YearDream 2nd-year: [Kaggle Competition IEEE-CIS Fraud Detection](https://www.kaggle.com/competitions/ieee-fraud-detection/overview)
 ## Only Using Machine-learning Methods
 ## Members
 * <https://github.com/choseyi>
