@@ -3,9 +3,9 @@
 .localized
 
 # Data
+data/
 .csv
 .xlsx
-data/
 
 # Jupyter Notebook
 .ipynb_checkpoints/
