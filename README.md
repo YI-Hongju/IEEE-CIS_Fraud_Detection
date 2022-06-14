@@ -4,6 +4,5 @@
 * <https://github.com/choseyi>
 * <https://github.com/sankeuny>
 * <https://github.com/YI-Hongju>
-* <https://github.com/danakang2022>
 * <https://github.com/Rum-j>
 * <https://github.com/Shinjibeom>
