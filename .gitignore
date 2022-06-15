@@ -8,4 +8,4 @@ data/
 .xlsx
 
 # Jupyter Notebook
-.ipynb_checkpoints/
+.ipynb_checkpoints/ 
