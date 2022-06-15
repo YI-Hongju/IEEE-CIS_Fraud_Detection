@@ -4,13 +4,8 @@
 
 # Data
 data/
-<<<<<<< HEAD
-.csv
-.xlsx
-=======
 *.csv
 *.xlsx
->>>>>>> e771d6cfb42ceb25d5718ea90047c46ee849f17e
 
 # Jupyter Notebook
 .ipynb_checkpoints/ 
