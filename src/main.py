@@ -1,9 +1,7 @@
-import pandas as pd
-from our_pkg import data_pkg
+from our_pkg import data_preparation
+from our_pkg import modeling
 
-from our_pkg.data_pkg import main
-from our_pkg import features_pkg
-from our_pkg import model_pkg
+import pandas as pd
 
 def get_submission(
     train_trsc,
@@ -12,18 +10,35 @@ def get_submission(
     test_id,
     sample_submsn,
 ):    
-    main.test_func()
+    datasets = data_preparation.main(train_trsc, train_id, test_trsc, test_id, sample_submsn)
 
-    # return processed_submission # 미확정 상태입니다. 개념만 보세요
+    processed_submsn = modeling.main(datasets)
+    return processed_submsn
 
-my_submission = get_submission(
+processed_submsn = get_submission(
     train_trsc='train_transaction.csv',
     train_id='train_identity.csv',
     test_trsc='test_transaction.csv',
     test_id='test_identity.csv',
     sample_submsn = 'sample_submission.csv'
 )
-my_submission.to_csv('./out/submission.csv')
+processed_submsn.to_csv('./out/submission.csv')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
