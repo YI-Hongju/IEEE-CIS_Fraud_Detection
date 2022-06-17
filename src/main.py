@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 42b13c2605aab02601eaa17fc745c20d1289a796
 import preparation as pp
@@ -9,11 +10,22 @@ import pandas as pd
 
 def get_submission(
     is_train_test_only,
+=======
+import pandas as pd
+from our_pkg import data_pkg
+
+from our_pkg.data_pkg import main
+from our_pkg import features_pkg
+from our_pkg import model_pkg
+
+def get_submission(
+>>>>>>> 038ac1d23f5312f0754b84bc33e271fe385e652c
     train_trsc,
     train_id,
     test_trsc,
     test_id,
     sample_submsn,
+<<<<<<< HEAD
     train_test
 ):
     if is_train_test_only:
@@ -31,10 +43,29 @@ my_submission = get_submission(
     test_id=None,
     sample_submsn='sample_submission.csv'
     train_test=['ver_01_0615.csv', 'ver_01_0615_test.csv']
+=======
+):    
+    main.test_func()
+
+    # return processed_submission # 미확정 상태입니다. 개념만 보세요
+
+my_submission = get_submission(
+    train_trsc='train_transaction.csv',
+    train_id='train_identity.csv',
+    test_trsc='test_transaction.csv',
+    test_id='test_identity.csv',
+    sample_submsn = 'sample_submission.csv'
+>>>>>>> 038ac1d23f5312f0754b84bc33e271fe385e652c
 )
 my_submission.to_csv('./out/submission.csv')
 
 
+<<<<<<< HEAD
+=======
+
+
+
+>>>>>>> 038ac1d23f5312f0754b84bc33e271fe385e652c
 # 아래 코드는 신경쓰지 마세요!
 
 # class Datasets():
@@ -73,6 +104,7 @@ my_submission.to_csv('./out/submission.csv')
 #     train='ver01_0615.csv', 
 #     test='ver01_0615_test.csv'
 <<<<<<< HEAD
+<<<<<<< HEAD
 # )
 =======
 from data_load import load
@@ -95,3 +127,6 @@ print(x.info())
 =======
 # )
 >>>>>>> 42b13c2605aab02601eaa17fc745c20d1289a796
+=======
+# )
+>>>>>>> 038ac1d23f5312f0754b84bc33e271fe385e652c
