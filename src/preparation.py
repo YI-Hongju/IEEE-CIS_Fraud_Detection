@@ -17,17 +17,17 @@
 import pandas as pd
 
 def load_data(trsc, id, is_joined=None,
-    is_origin,  
-    is_trsc_id_merged,
-    train_trsc,
-    train_id,
-    test_trsc,
-    test_id,
-    train,
-    test
+    # is_origin,
+    # is_trsc_id_merged,
+    # train_trsc,
+    # train_id,
+    # test_trsc,
+    # test_id,
+    # train,
+    # test
 ):
 #1. Transaction dataset only
-    if trans:
+    if trsc:
         df_trans = pd.read_csv('./0615_train_pp_ver1.csv')
         print(df_trans.describe())
         return df_trans
@@ -35,15 +35,14 @@ def load_data(trsc, id, is_joined=None,
     if id:
         df_id = pd.read_csv('./train_identity.csv')
         print(df_id.describe())
-
         return df_id
 #3. Join datasets
     if is_joined == 'outer':
-        df_merged_right = pd.merge(df_id, df, how="inner", on = 'TransactionID')
+        df_merged_right = pd.merge(df_id, df_trans, how="inner", on = 'TransactionID')
         print(df_merged_right.describe())
         return df_merged_right
     elif is_joined == 'inner':
-        df_merged_right = pd.merge(df_id, df, how="outer", on = 'TransactionID')
+        df_merged_right = pd.merge(df_id, df_trans, how="outer", on = 'TransactionID')
         print(df_merged_right.describe())
         return df_merged_right
     # elif ...
