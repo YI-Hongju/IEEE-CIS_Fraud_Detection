@@ -1,4 +1,7 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 42b13c2605aab02601eaa17fc745c20d1289a796
 '''
 데이터 준비 모듈
     데이터셋 불러오기
@@ -45,6 +48,7 @@ def load_data(trsc, id, is_joined=None,
         return df_merged_right
     # elif ...
 
+<<<<<<< HEAD
 =======
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
@@ -285,3 +289,5 @@ class row_processing:
 
         return df, recommends
 >>>>>>> b_0617
+=======
+>>>>>>> 42b13c2605aab02601eaa17fc745c20d1289a796

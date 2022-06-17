@@ -1,4 +1,7 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 42b13c2605aab02601eaa17fc745c20d1289a796
 import preparation as pp
 import modeling as mdling
 
@@ -69,6 +72,7 @@ my_submission.to_csv('./out/submission.csv')
 #     is_origin_data=False,
 #     train='ver01_0615.csv', 
 #     test='ver01_0615_test.csv'
+<<<<<<< HEAD
 # )
 =======
 from data_load import load
@@ -88,3 +92,6 @@ print(x.info())
 
 
 >>>>>>> b_0617
+=======
+# )
+>>>>>>> 42b13c2605aab02601eaa17fc745c20d1289a796
