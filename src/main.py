@@ -12,7 +12,7 @@ def get_submission(
     status
 ):    
     class Datasets():
-        def __init__(self, train_trsc, train_id, test_trsc, test_id, sample_submsn):
+        def __init__(self, train_trsc, train_id, test_trsc, test_id, sample_submsn, status):
             if status == 'raw':
                 self.base_path = './data/raw/'
             elif status == 'processed':
@@ -42,12 +42,13 @@ def get_submission(
         train_id=train_id,
         test_trsc=test_trsc,
         test_id=test_id,
-        sample_submsn=sample_submsn
+        sample_submsn=sample_submsn,
+        status=status
     )
 
-    datasets = data_preparation.main(datasets)
+    df_datasets = data_preparation.main(datasets)
 
-    processed_submsn = modeling.main(datasets)
+    processed_submsn = modeling.main(df_datasets)
     return processed_submsn
 
 processed_submsn = get_submission(
