@@ -5,40 +5,41 @@ def get_df(datasets, is_only=None, join=None):
 
     class DFDatasets():
         def __init__(self, datasets):
-            self.train_trsc = pd.read_csv(datasets.train_trsc)
-            self.train_id = pd.read_csv(datasets.train_id)
-            self.test_trsc = pd.read_csv(datasets.test_trsc)
-            self.test_id = pd.read_csv(datasets.test_id)
             self.sample_submsn = pd.read_csv(datasets.sample_submsn)
 
     df_datasets = DFDatasets(datasets)
 
     # Transaction data only
     if is_only == 'transaction':
-        del df_datasets.train_id
-        del df_datasets.test_id
-
+        df_datasets.train_trsc = pd.read_csv(datasets.train_trsc)
+        df_datasets.test_trsc = pd.read_csv(datasets.test_trsc)
+        
         print('Load Datasets as DataFrame Succeed!')
         return df_datasets
 
     # Identity data only
     elif is_only == 'identity':
-        del df_datasets.train_trsc
-        del df_datasets.test_trsc
+        df_datasets.train_id = pd.read_csv(datasets.train_id)
+        df_datasets.test_id = pd.read_csv(datasets.test_id)
 
         print('Load Datasets as DataFrame Succeed!')
         return df_datasets
 
     else: # is_only == None
         if join == 'inner':
+            df_datasets.train_trsc = pd.read_csv(datasets.train_trsc)
+            df_datasets.train_id = pd.read_csv(datasets.train_id)
+            df_datasets.test_trsc = pd.read_csv(datasets.test_trsc)
+            df_datasets.test_id = pd.read_csv(datasets.test_id)
+
             df_datasets.train_merged = datasets.train_trsc.merge(
                 datasets.train_id, 
-                how="inner", 
+                how=join, 
                 on='TransactionID'
             )
             df_datasets.test_merged = datasets.test_trsc.merge(
                 datasets.test_id, 
-                how="inner", 
+                how=join, 
                 on='TransactionID'
             )
 
@@ -49,17 +50,21 @@ def get_df(datasets, is_only=None, join=None):
 
             print(f'Load Datasets as DataFrame and \
 Merging as {join} Succeed!')
-
             return df_datasets
         elif join == 'outer':
+            df_datasets.train_trsc = pd.read_csv(datasets.train_trsc)
+            df_datasets.train_id = pd.read_csv(datasets.train_id)
+            df_datasets.test_trsc = pd.read_csv(datasets.test_trsc)
+            df_datasets.test_id = pd.read_csv(datasets.test_id)
+
             df_datasets.train_merged = datasets.train_trsc.merge(
                 datasets.train_id, 
-                how="outer", # 'outer'
+                how=join, # 'outer'
                 on='TransactionID'
             )
             df_datasets.test_merged = datasets.test_trsc.merge(
                 datasets.test_id, 
-                how="outer", # 'outer'
+                how=join, # 'outer'
                 on='TransactionID'
             )
 
@@ -70,13 +75,27 @@ Merging as {join} Succeed!')
 
             print(f'Load Datasets as DataFrame and \
 Merging as {join} Succeed!')
-
             return df_datasets
 
         else: # join == None
-            print(f'Load Datasets as DataFrame Succeed!')
+            df_datasets.train_trsc = pd.read_csv(datasets.train_trsc)
+            df_datasets.train_id = pd.read_csv(datasets.train_id)
+            df_datasets.test_trsc = pd.read_csv(datasets.test_trsc)
+            df_datasets.test_id = pd.read_csv(datasets.test_id)
 
+            print(f'Load Datasets as DataFrame Succeed!')
             return df_datasets
+
+def select_col_by_missings(df, threshold): # 결측치에 따라 컬럼 셀력션을 해주는 메소드
+    # threshold = 0.1, 0.2, ...
+    # 0.2 = 20% "이하"의 결측치를 가진 컬럼만 골라줌
+
+    identity_name = [] # All Columns or 'id' Columns only?
+
+    for i in range(0, len(df.columns)): # Origin code: len(df.iloc[0, :])
+        if (df.iloc[:, i].isnull().sum() / len(df.iloc[:, 0])) > threshold: # Origin code: < num
+            identity_name.append(df.iloc[:, i].name)
+    df = df[identity_name]
 
 def handle_missing_values(df):
     # Handling Missing-data
@@ -150,12 +169,12 @@ def handle_missing_values(df):
             # 4.0        659
             df[dist_x] = df[dist_x].fillna(df[dist_x].mode()[0])
             recommends.append(dist_x)
-    #email_domains
+    # Email_domains
     mails = ['P_emaildomain', 'R_emaildomain']
     for mail_x in mails:
         if mail_x == 'P_emaildomain':
             # Non missing-values are 84.00%
-            # Mode:gmail.com (228355)
+            # Mode: gmail.com (228355)
             # N of unique: 59
             df[mail_x] = df[mail_x].fillna('gmail.com')
         else:  # elif mail_x == 'R_emaildomain':
@@ -173,58 +192,64 @@ def handle_missing_values(df):
             df[mail_x] = df[mail_x].fillna('gmail.com')
             recommends.append(mail_x)
 
-    idnu_over100 = ['id_02', 'id_06', 'id_11', 'id_17', 'id_19', 'id_20', 'id_21', 'id_25', 'id_31']
-    for id_2 in idnu_over100: #large nunique
-        if df[id_2].dtype != 'object'  : #numerical, small unique
-            #Numerical 인 데이터 : median으로 채움
-            df[id_2] = df[id_2].fillna(df[id_2].median())
+    # Identity table - Divided into nunique > 100 or not == id_nuniq_{high, lows} [list]
+    id_nuniq_lows = [
+        'id-01', 'id-03', 'id-04', 'id-05', 'id-07', 'id-08', 
+        'id-09', 'id-10', 'id-12', 'id-13', 'id-14', 'id-15', 
+        'id-16', 'id-18', 'id-22', 'id-23', 'id-24', 'id-26', 
+        'id-27', 'id-28', 'id-29', 'id-30', 'id-32'
+    ]
+    for id_col in id_nuniq_lows:  # Column is Samll volume in nunique
+        if df[id_col].dtype != 'object':  # Numerical, Small unique <- ???
+            # Numerical인 데이터 : Fill to Median
+            df[id_col] = df[id_col].fillna(df[id_col].median())
+
             # 결측치 50% 이상이면 삭제 추천
-            if (df[id_2].isna().sum() / len(df[id_2]) ) >0.5 :
-                    recommends.append(id_2)
-        else:  # categorical
-            df[id_2] = df[id_2].fillna(df[id_2].mode())
+            if (df[id_col].isna().sum() / len(df[id_col])) >= 0.5:
+                recommends.append(id_col)
+        else: # Categorical data
+            # NaN이 많은 column 중 'isFraud'가 유의미한 값일 때가 많아,
+            # 'Mode'가 아닌 제 3의 카테고리 'Unknown'으로 채움 <- 추가 설명 부탁드립니다!
+            df[id_col] = df[id_col].fillna('Unknown')
 
+    id_nuniq_highs = [
+        'id-02', 'id-06', 'id-11', 'id-17', 'id-19', 
+        'id-20', 'id-21', 'id-25', 'id-31'
+    ]
+    for id_col in id_nuniq_highs: # Column is Large volume in nunique
+        if df[id_col].dtype != 'object': # Numerical and small unique <- ???
+            # Numerical인 데이터 : Fill to Median
+            df[id_col] = df[id_col].fillna(df[id_col].median())
 
-        # identity table - divided into nunique > 100 or not
-        idnu_under100 = ['id_01', 'id_03', 'id_04', 'id_05', 'id_07', 'id_08', 'id_09', 'id_10', 'id_12', 'id_13', 'id_14',
-                            'id_15', 'id_16', 'id_18', 'id_22', 'id_23', 'id_24', 'id_26', 'id_27', 'id_28', 'id_29', 'id_30',
-                            'id_32']
-    for id_1 in idnu_under100:  # smallnunique
-        if df[id_1].dtype != 'object':  # numerical, small unique
-            # Numerical 인 데이터 : median으로 채움
-            df[id_1] = df[id_1].fillna(df[id_1].median())
             # 결측치 50% 이상이면 삭제 추천
-            if (df[id_1].isna().sum() / len(df[id_1])) > 0.5:
-                recommends.append(id_1)
-    else:  # categorical
-        # Nan이 많은 column 중 isFraud 가 유의미한 값일 때가 많아 mode가 아닌 제3의 카테고리로 채움
-        df[id_1] = df[id_1].fillna('Unknown')
+            if (df[id_col].isna().sum() / len(df[id_col]) ) >= 0.5:
+                recommends.append(id_col)
+        else: # Categorical data
+            df[id_col] = df[id_col].fillna(df[id_col].mode())
 
-def select_col_by_missings(df, threshold):
-    # threshold = 0.1, 0.2, ...
-    # 0.2 = 20% 이하의 결측치를 가진 컬럼만 골라줌
-
-    identity_name = []
-
-    for i in range(0, len(df.columns)):
-        if (df.iloc[:, i].isnull().sum() / len(df.iloc[:, 0])) < num:
-            identity_name.append(df.iloc[:, i].name)
-    df = df[identity_name]
-    return df
+    # Column to Drop
+    return recommends
 
 def main(datasets):
+    # Get datasets from data/
     df_datasets = get_df(
         datasets=datasets,
         # is_only='transaction', [예시 코드]
         # join='inner' [예시 코드]
     )
     
-    # Handling missing-values
-    handle_missing_values(df_datasets)
-
     # Column selection
-    select_col_by_missings()
+    for df in vars(df_datasets).keys():
+        select_col_by_missings(getattr(df_datasets, df), 0.2) # 0.2%
+
+    # Handling missing-values and Recommand lists
+    recommand_drop_cols = list()
+    for df in vars(df_datasets).keys():
+        recommand_drop_cols.append(handle_missing_values(getattr(df_datasets, df)))
+    recommand_drop_cols = [col for ls in recommand_drop_cols for col in ls] # 2D array to 1D array
 
     # Under-sampling
+    
 
     return df_datasets
+    

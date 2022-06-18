@@ -12,6 +12,10 @@ data/
 
 # Python
 __pycache__/
+test.py
 
-# Temporary
+# Temporary files
 tmp_*.ipynb
+
+# h2o 7333...............
+h2o_0613.ipynb

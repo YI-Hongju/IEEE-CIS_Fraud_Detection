@@ -1,5 +1,5 @@
-from our_pkg import data_preparation
-from our_pkg import modeling
+from pkg import data_preparation
+from pkg import modeling
 
 import pandas as pd
 
