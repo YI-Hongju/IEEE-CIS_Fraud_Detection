@@ -1,19 +1,77 @@
+from our_pkg import data_preparation
+from our_pkg import modeling
+
 import pandas as pd
-import numpy as np
-import matplotlib.pylab as plt
-import seaborn as sns
-from pandas_profiling import ProfileReport
 
+def get_submission(
+    train_trsc,
+    train_id,
+    test_trsc,
+    test_id,
+    sample_submsn,
+    status
+):    
+    class Datasets():
+        def __init__(self, train_trsc, train_id, test_trsc, test_id, sample_submsn, status):
+            if status == 'raw':
+                self.base_path = './data/raw/'
+            elif status == 'processed':
+                self.base_path = './data/processed/'
+            elif status == 'pended':
+                self.base_path = './data/pended/'
+            else: 
+                print('[\'status\'] value error.')
+                return False
 
-# train_id = pd.read_csv("/Volumes/Samsung USB/yeardream/modeling_miniPRJ/data/train_identity.csv")
-train_trsc = pd.read_csv("/Volumes/Samsung USB/yeardream/modeling_miniPRJ/data/train_transaction.csv")
+            self.train_trsc = self.base_path + train_trsc
+            self.train_id = self.base_path + train_id
+            self.test_trsc = self.base_path + test_trsc
+            self.test_id = self.base_path + test_id
+            self.sample_submsn = self.base_path + sample_submsn
 
-# df_train_id = pd.DataFrame(train_id)
-df_train_trsc = pd.DataFrame(train_trsc)
+        # 요건 신경쓰지 마셔유들~
+        # def print_id(self):
+        #     datas = [train_trsc, train_id, test_trsc, test_id, sample_submsn]
 
-# profile1 = ProfileReport(df_train_id)
-profile2 = ProfileReport(df_train_trsc, 
-correlations={"cramers": {"calculate": False},"pearson": {"calculate": False},"spearman": {"calculate": False},"kendall": {"calculate": False},"phi_k": {"calculate": False}})
+        #     print('Location on Memory:')
+        #     for data in datas:
+        #         print(id(self.data))
 
-# profile1.to_file("report_train_id.html")
-profile2.to_file("report_train_trsc.html")
+    datasets = Datasets(
+        train_trsc=train_trsc,
+        train_id=train_id,
+        test_trsc=test_trsc,
+        test_id=test_id,
+        sample_submsn=sample_submsn,
+        status=status
+    )
+
+    df_datasets = data_preparation.main(datasets)
+    if df_datasets:
+        print('Data preparation Succeed!\nInit Modeling session...')
+    else:
+        print('Data preparation Failed!\nCannot Init Modeling session...')
+        return False
+
+    # processed_submsn = modeling.main(df_datasets) [코드 시험 운행을 위해 주석 처리한 것, 실제로 사용될 코드!]
+    # if processed_submsn:
+    #     print('Main processing Succeed!\nMake .csv file...')
+    # else:
+    #     print('Main processing Failed!\nCannot Make .csv file...')
+    #     return False
+    # return processed_submsn
+
+processed_submsn = get_submission(
+    train_trsc='train_transaction.csv',
+    train_id='train_identity.csv',
+    test_trsc='test_transaction.csv',
+    test_id='test_identity.csv',
+    sample_submsn='sample_submission.csv',
+    status='raw' # raw / processed / pended
+)
+# processed_submsn.to_csv('./out/submission.csv') [코드 시험 운행을 위해 주석 처리한 것, 실제로 사용될 코드!]
+# if processed_submns:
+#     print('All processes are Succeed!\nCheck ./out/submission.csv!')
+# else:
+#     print('Makint .csv file Failed!')
+#     return False
