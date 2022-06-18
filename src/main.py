@@ -118,4 +118,3 @@ processed_submsn.to_csv('./out/submission.csv')
 #     train='ver01_0615.csv', 
 #     test='ver01_0615_test.csv'
 # )
->>>>>>> be976d1898f8bc4a9440139439a4a435c0497f57
