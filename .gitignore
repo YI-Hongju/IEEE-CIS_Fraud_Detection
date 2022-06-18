@@ -17,5 +17,8 @@ test.py
 # Temporary files
 tmp_*.ipynb
 
+# Member's codes for Merging
+MemberCodes/
+
 # h2o 7333...............
 h2o_0613.ipynb
