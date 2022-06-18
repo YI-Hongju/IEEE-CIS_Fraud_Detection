@@ -75,3 +75,4 @@ processed_submsn = get_submission(
 # else:
 #     print('Makint .csv file Failed!')
 #     return False
+>>>>>>> 04960a0 (Build data_praparation.get_df())
