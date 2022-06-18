@@ -46,9 +46,9 @@ def get_submission(
         status=status
     )
 
-    df_datasets = data_preparation.main(datasets)
+    # df_datasets = data_preparation.main(datasets) [코드 시험 운행을 위해 주석 처리한 것, 실제로 사용될 코드!]
 
-    processed_submsn = modeling.main(df_datasets)
+    # processed_submsn = modeling.main(df_datasets) [코드 시험 운행을 위해 주석 처리한 것, 실제로 사용될 코드!]
     return processed_submsn
 
 processed_submsn = get_submission(
@@ -59,7 +59,7 @@ processed_submsn = get_submission(
     sample_submsn='sample_submission.csv',
     status='raw' # raw / processed / pended
 )
-processed_submsn.to_csv('./out/submission.csv')
+# processed_submsn.to_csv('./out/submission.csv') [코드 시험 운행을 위해 주석 처리한 것, 실제로 사용될 코드!]
 
 
 
