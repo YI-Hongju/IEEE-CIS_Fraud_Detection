@@ -9,3 +9,10 @@ data/
 
 # Jupyter Notebook
 .ipynb_checkpoints/
+
+# Python
+__pycache__/
+
+# Temporary
+tmp_*.ipynb
+>>>>>>> dfd8fc0 (Add tmp_*.ipynb files to ignore-list)
