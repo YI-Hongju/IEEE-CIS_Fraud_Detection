@@ -1,9 +1,11 @@
-from tkinter import Label
+from webbrowser import get
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 
-from statsmodels.stats.outliers_influence import variance_inflation_factor
-
+from sklearn.decomposition import PCA
 from sklearn.preprocessing import LabelEncoder
+from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 def get_df(datasets, is_only=None, join=None):
     #데이터 로드 as dataframe & 간략한 정보
@@ -235,19 +237,19 @@ def handle_missing_values(df):
     # Column to Drop
     return recommends
 
-def apply_PCA(X, n_components, show_plot):
-    from sklearn.decomposition import PCA
-    pca = PCA(n_components=n_components)  # if 0.9 = 원래 데이터의 90%를 보존
-    pca_090 = pca.fit(X)  # 학습 및 변환
-    reduced_X = pca_090.transform(X)
-    print("explained variance ratio:", pca.explained_variance_ratio_) #분산 비율
-    print("shape:", reduced_X.shape) #PCA df shape
+def process_PCA(df, X, n_components, show_plot): #df: Initial dataframe, X: PCA가 필요한 컬럼들만 있는 데이터프레임
+    pca = PCA(n_components=n_components)  # e.g., 0.9: 원래 데이터의 90%를 보존
+    pca_90 = pca.fit(X) # 학습
+    transformed_X = pca_90.transform(X) # 변환
+    print("Explained variance ratio:", pca.explained_variance_ratio_) # 분산 비율
+    print("Shape:", transformed_X.shape) # PCA df shape
+
+    labels = [f"Principal Components {x}" for x in range(1, transformed_X.shape[1] + 1)]
 
     if show_plot:
-        labels = [f"PC{x}" for x in range(1, reduced_X.shape[1] + 1)]
-        pca_090_variance = np.round(pca_090.explained_variance_ratio_.cumsum() * 100, decimals=1)
+        pca_90_variance = np.round(pca_90.explained_variance_ratio_.cumsum() * 100, decimals=1)
         plt.figure(figsize=(25, 5))
-        plt.bar(x=range(1, len(pca_090_variance) + 1), height=pca_090_variance, tick_label=labels)
+        plt.bar(x=range(1, len(pca_90_variance) + 1), height=pca_90_variance, tick_label=labels)
 
         plt.xticks(rotation=90, color='indigo', size=15)
         plt.yticks(rotation=0, color='indigo', size=15)
@@ -256,10 +258,11 @@ def apply_PCA(X, n_components, show_plot):
         plt.ylabel('Cumulative percentage of explained variance ', {'color': 'tab:orange', 'fontsize': 15})
         plt.show()
 
-    pca_df = pd.DataFrame(reduced_X, columns=labels)
-    print(pca_df)
+    df_PCA = pd.DataFrame(transformed_X, columns=labels)
+    print(f'PCA processed DataFrame\n', df_PCA)
 
-    return pca_df
+    df_dropped = df.drop(columns=X.columns, axis=1)
+    df = pd.merge(df_dropped, df_PCA, axis=1)
 
 # 다중공선성 계산
 def get_vif_table(df):
@@ -333,15 +336,13 @@ def drop_col_train_test(df_datasets, drops):
     print(f'Train-Test column droping and synchronizing Succeed.\nShape of Train: {df_datasets.train.shape}\n\
 Shape of Train: {df_datasets.test.shape}')
 
-# TODO: Label encoding
-def z(df, columns: list):  # 컬럼명 리스트 기준으로 레이블인코딩
-    output = df.copy()
+def label_encoder(df):  # 컬럼명 리스트 기준으로 레이블인코딩
+    for col in df.columns:
+        if df[col].dtypes == 'O':
+            le = LabelEncoder()
+            scaled_val = le.fit_transform(df[col])
+            df.loc[:, col] = scaled_val
 
-    le = LabelEncoder()
-    le.fit()
-    return output
-
-# TODO: 언더샘플링 함수, n = 타겟 컬럼의 n배수의 non 타겟 컬럼 개수를 골라줌 <- ???
 def get_under_samples(df, rate):
     # Find Number of samples which are Fraud
     non_frauds = len(df[df['id_col'] == 1]) * n  # 열 배
@@ -380,13 +381,25 @@ def main(datasets):
         recommand_drop_cols.append(handle_missing_values(getattr(df_datasets, df)))
     recommand_drop_cols = [col for ls in recommand_drop_cols for col in ls] # 2D array to 1D array
     
-    # Encoding
+    # Label encoding
+    for df in vars(df_datasets).keys():
+        label_encoder(getattr(df_datasets, df))
 
     # Calcutate VIF
     for df in vars(df_datasets).keys():
         get_vif_table(getattr(df_datasets, df))
 
-    # TODO: Apply VIF?
+    # # TODO: Apply VIF?
+    # apply_VIF()
+
+    # PCA
+    for df in vars(df_datasets).keys():
+        process_PCA(
+            getattr(df_datasets, df),
+            X=None,
+            n_components=0.9,
+            show_plot=False
+        )
 
     # Get Train/Test datasets
     get_train_test(df_datasets, join=None, on=None) # get_train_test(df_datasets, join='inner', on='TransactionID) [예시 코드]
@@ -396,8 +409,10 @@ def main(datasets):
     # drops = recommand_drop_cols [예시 코드]
     # drop_col_train_test(df_datasets, drops)
 
-    # Under-samping
-    get_under_samples()
+    # # TODO: Under-samping
+    # get_under_samples(df, rate)
 
+    # Scaling
+    # TODO: TODO: optioned_scaler
 
     return df_datasets

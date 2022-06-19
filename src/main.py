@@ -1,5 +1,10 @@
-from pkg import data_preparation
-from pkg import modeling
+import sys, os
+sys.path.append(
+    os.path.dirname(os.path.dirname(__file__))
+)
+
+import pkg.data_preparation
+import pkg.data_preparation
 
 import pandas as pd
 
@@ -46,14 +51,14 @@ def get_submission(
         status=status
     )
 
-    df_datasets = data_preparation.main(datasets)
+    df_datasets = pkg.data_preparation.main(datasets)
     if df_datasets:
         print('Data preparation Succeed!\nInit Modeling session...')
     else:
         print('Data preparation Failed!\nCannot Init Modeling session...')
         return False
 
-    # processed_submsn = modeling.main(df_datasets) [코드 시험 운행을 위해 주석 처리한 것, 실제로 사용될 코드!]
+    # processed_submsn = pkg.modeling.main(df_datasets) [코드 시험 운행을 위해 주석 처리한 것, 실제로 사용될 코드!]
     # if processed_submsn:
     #     print('Main processing Succeed!\nMake .csv file...')
     # else:
