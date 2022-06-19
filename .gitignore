@@ -13,6 +13,7 @@ data/
 # Python
 __pycache__/
 test.py
+test.ipynb
 
 # Temporary files
 tmp_*.ipynb
