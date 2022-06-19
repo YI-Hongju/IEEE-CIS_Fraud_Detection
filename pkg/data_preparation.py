@@ -95,12 +95,12 @@ def select_col_by_missings(df, threshold): # 결측치에 따라 컬럼 셀력�
     # threshold = 0.1, 0.2, ...
     # 0.2 = 20% "이하"의 결측치를 가진 컬럼만 골라줌
 
-    identity_name = [] # All Columns or 'id' Columns only?
+    cols = [] # All Columns or 'id' Columns only?
 
     for i in range(0, len(df.columns)): # Origin code: len(df.iloc[0, :])
         if (df.iloc[:, i].isnull().sum() / len(df.iloc[:, 0])) > threshold: # Origin code: < num
-            identity_name.append(df.iloc[:, i].name)
-    df = df[identity_name]
+            cols.append(df.iloc[:, i].name)
+    df = df[cols]
 
 def handle_missing_values(df):
     # Handling Missing-data
@@ -214,7 +214,7 @@ def handle_missing_values(df):
                 recommends.append(id_col)
         else: # Categorical data
             # NaN이 많은 column 중 'isFraud'가 유의미한 값일 때가 많아,
-            # 'Mode'가 아닌 제 3의 카테고리 'Unknown'으로 채움 <- 추가 설명 부탁드립니다!
+            # 'Mode'가 아닌 제 3의 카테고리 'Unknown'으로 채움 "편향 방지용!"
             df[id_col] = df[id_col].fillna('Unknown')
 
     id_nuniq_highs = [
@@ -337,14 +337,12 @@ Shape of Train: {df_datasets.test.shape}')
 def z(df, columns: list):  # 컬럼명 리스트 기준으로 레이블인코딩
     output = df.copy()
 
-    
-
     le = LabelEncoder()
     le.fit()
     return output
 
 # TODO: 언더샘플링 함수, n = 타겟 컬럼의 n배수의 non 타겟 컬럼 개수를 골라줌 <- ???
-def get_under_samples(df, n):
+def get_under_samples(df, rate):
     # Find Number of samples which are Fraud
     non_frauds = len(df[df['id_col'] == 1]) * n  # 열 배
 
@@ -386,7 +384,7 @@ def main(datasets):
 
     # Calcutate VIF
     for df in vars(df_datasets).keys():
-        get_vif_table(getattr(df_datasets, df)) # TODO: How to apply?
+        get_vif_table(getattr(df_datasets, df))
 
     # TODO: Apply VIF?
 
