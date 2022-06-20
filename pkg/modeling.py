@@ -14,43 +14,8 @@ from catboost import CatBoostClassifier, Pool
 
 
 
-# DataFrame memory reduction
-def reduce_mem_usage(df, verbose=True):
-    numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
-    start_mem = df.memory_usage().sum() / 1024**2    
-    for col in df.columns:
-        col_type = df[col].dtypes
-        if col_type in numerics:
-            c_min = df[col].min()
-            c_max = df[col].max()
-            if str(col_type)[:3] == 'int':
-                if c_min > np.iinfo(np.int8).min and c_max < np.iinfo(np.int8).max:
-                    df[col] = df[col].astype(np.int8)
-                elif c_min > np.iinfo(np.int16).min and c_max < np.iinfo(np.int16).max:
-                    df[col] = df[col].astype(np.int16)
-                elif c_min > np.iinfo(np.int32).min and c_max < np.iinfo(np.int32).max:
-                    df[col] = df[col].astype(np.int32)
-                elif c_min > np.iinfo(np.int64).min and c_max < np.iinfo(np.int64).max:
-                    df[col] = df[col].astype(np.int64)  
-            else:
-                if c_min > np.finfo(np.float16).min and c_max < np.finfo(np.float16).max:
-                    df[col] = df[col].astype(np.float16)
-                elif c_min > np.finfo(np.float32).min and c_max < np.finfo(np.float32).max:
-                    df[col] = df[col].astype(np.float32)
-                else:
-                    df[col] = df[col].astype(np.float64)    
-    end_mem = df.memory_usage().sum() / 1024**2
-    if verbose: print('Mem. usage decreased to {:5.2f} Mb ({:.1f}% reduction)'.format(end_mem, 100 * (start_mem - end_mem) / start_mem))
-    return df
-
-
-# Set train, test data
-X_train, X_val, y_train, y_val = train_test_split(df_train, y_target, test_size=0.3, random_state=156)
-
-
-
 # Evalutate the model
-def get_clf_eval(y_test, y_pred):
+def get_clf_eval(y_val, y_pred):
     confusion = confusion_matrix(y_test, y_pred)
     accuracy = accuracy_score(y_test, y_pred)
     precision = precision_score(y_test, y_pred)
@@ -67,20 +32,20 @@ def get_clf_eval(y_test, y_pred):
 
 
 # Running XGB
-def XGB():
-    xgb_clf = XGBClassifier(
+def XGBoost(X_train, X_val, y_train, y_val):
+    clf = XGBClassifier(
         n_estimators=5000, 
         colsample_bytree=0.75, 
         max_depth=12, 
         min_child_weight=1,
         subsample=0.8,
-    #     missing=-999,
+        # missing=-999,
         early_stopping_rounds=200
-        )
+    )
 
-    xgb_clf.fit(X_train, y_train, eval_metric="auc", eval_set=[(X_val, y_val)], verbose = 3)
-    pred = xgb_clf.predict(X_val)
-    pred_proba = xgb_clf.predict_proba(X_val)[:1]
+    clf.fit(X_train, y_train, eval_metric="auc", eval_set=[(X_val, y_val)], verbose = 3)
+    pred = clf.predict(X_val)
+    pred_proba = clf.predict_proba(X_val)[:1]
 
     fig, ax = plt.subplots(figsize=(10,10))
     plot_importance(xgb_clf, ax=ax, max_num_features=50, height=0.4)
@@ -91,7 +56,7 @@ def XGB():
 
 
 # Running LightGBM
-def LGB():
+def LGBM(X_train, X_val, y_train, y_val):
     lgb_clf = LGBMClassifier(
         n_estimators=5000,
         max_depth=20,
@@ -112,7 +77,7 @@ def LGB():
 
 
 # Running CatBoost
-def CAT():
+def CatBoost(X_train, X_val, y_train, y_val):
     cat_clf = CatBoostClassifier(
         n_estimators=200,
         depth = 10,
@@ -128,20 +93,6 @@ def CAT():
 
     get_clf_eval(y_val, pred)
 
-# Evalutate the model
-def get_clf_eval(y_test, y_pred):
-    confusion = confusion_matrix(y_test, y_pred)
-    accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred)
-    recall = recall_score(y_test, y_pred)
-    F1 = f1_score(y_test, y_pred)
-    AUC = roc_auc_score(y_test, y_pred)
-    print('오차행렬:\n', confusion)
-    print('\n정확도: {:.4f}'.format(accuracy))
-    print('정밀도: {:.4f}'.format(precision))
-    print('재현률: {:.4f}'.format(recall))
-    print('F1 score: {:.4f}'.format(F1))
-    print('AUC score: {:.4f}'.format(AUC))
 
 
 def main(df_datasets):
@@ -149,6 +100,22 @@ def main(df_datasets):
     for df in vars(df_datasets).keys():
         reduce_mem_usage(getattr(df_datasets, df))
 
-    # 
+
+
+    # XGBoost(X_train, X_val, y_train, y_val)
+    # e.g., XGBoost(df_datasets)
+        # X_train = df_datasets.X_train
+
+
+    
+    # XGBoost(X_train, X_val, y_train, y_val)
+    # e.g., XGBoost(df_datasets)
+        # X_train = df_datasets.X_train
+
+    # XGBoost(X_train, X_val, y_train, y_val)
+    # e.g., XGBoost(df_datasets)
+        # X_train = df_datasets.X_train
+
+
 
     pass
