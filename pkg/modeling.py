@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+import matplotlib as plt
+import seaborn as sns
 
 from xgboost import XGBClassifier, plot_importance
 from lightgbm import LGBMClassifier, plot_importance
@@ -13,7 +15,7 @@ from catboost import CatBoostClassifier, Pool
 
 
 # DataFrame memory reduction
-def reduce_mem_usage(df, verbose=True) -> pd.DataFrame : 
+def reduce_mem_usage(df, verbose=True):
     numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
     start_mem = df.memory_usage().sum() / 1024**2    
     for col in df.columns:
@@ -42,6 +44,10 @@ def reduce_mem_usage(df, verbose=True) -> pd.DataFrame :
     return df
 
 
+# Set train, test data
+X_train, X_val, y_train, y_val = train_test_split(df_train, y_target, test_size=0.3, random_state=156)
+
+
 
 # Evalutate the model
 def get_clf_eval(y_test, y_pred):
@@ -57,11 +63,6 @@ def get_clf_eval(y_test, y_pred):
     print('재현률: {:.4f}'.format(recall))
     print('F1 score: {:.4f}'.format(F1))
     print('AUC score: {:.4f}'.format(AUC))
-
-
-
-# Set train, test data
-X_train, X_val, y_train, y_val = train_test_split(df_train, y_target, test_size=0.3, random_state=156)
 
 
 
@@ -82,7 +83,7 @@ def XGB():
     pred_proba = xgb_clf.predict_proba(X_val)[:1]
 
     fig, ax = plt.subplots(figsize=(10,10))
-    plot_importance(lgb_clf, ax=ax, max_num_features=50, height=0.4)
+    plot_importance(xgb_clf, ax=ax, max_num_features=50, height=0.4)
     plt.show()
 
     get_clf_eval(y_val, pred)
@@ -127,6 +128,27 @@ def CAT():
 
     get_clf_eval(y_val, pred)
 
+# Evalutate the model
+def get_clf_eval(y_test, y_pred):
+    confusion = confusion_matrix(y_test, y_pred)
+    accuracy = accuracy_score(y_test, y_pred)
+    precision = precision_score(y_test, y_pred)
+    recall = recall_score(y_test, y_pred)
+    F1 = f1_score(y_test, y_pred)
+    AUC = roc_auc_score(y_test, y_pred)
+    print('오차행렬:\n', confusion)
+    print('\n정확도: {:.4f}'.format(accuracy))
+    print('정밀도: {:.4f}'.format(precision))
+    print('재현률: {:.4f}'.format(recall))
+    print('F1 score: {:.4f}'.format(F1))
+    print('AUC score: {:.4f}'.format(AUC))
 
-def main(datasets):
+
+def main(df_datasets):
+    # Memory reducing
+    for df in vars(df_datasets).keys():
+        reduce_mem_usage(getattr(df_datasets, df))
+
+    # 
+
     pass
