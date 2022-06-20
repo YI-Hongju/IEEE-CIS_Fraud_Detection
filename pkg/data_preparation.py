@@ -209,7 +209,7 @@ def handle_missing_values(df):
     for id_col in id_nuniq_lows:  # Column is Samll volume in nunique
         if df[id_col].dtype != 'object':  # Numerical, Small unique
             # Numerical인 데이터 : Fill to Median
-            df[id_col] = df[id_col].fillna(df[id_col].median())
+            df[id_col] = df[id_col].fillna(df[id_col].mode())
 
             # 결측치 50% 이상이면 삭제 추천
             if (df[id_col].isna().sum() / len(df[id_col])) >= 0.5:
@@ -265,12 +265,17 @@ def process_PCA(df, X, n_components, show_plot): #df: Initial dataframe, X: PCA�
     df = pd.merge(df_dropped, df_PCA, axis=1)
 
 # 다중공선성 계산
-def get_vif_table(df):
+def process_VIF(df, X): # df: Initial DataFrame, X: DataFrame which has to be reduced
     VIF_table = pd.DataFrame({
-        "VIF Factor": [variance_inflation_factor(df.values, idx) for idx in range(df.shape[1])],
-        "features": df.columns,
+        "VIF Factor": [variance_inflation_factor(X.values, idx) for idx in range(X.shape[1])],
+        "features": X.columns,
     })
-    return VIF_table
+    print(VIF_table)
+
+    VIF_table = VIF_table.sort_values('VIF Factor', ascending=False)
+    VIF_list = list(VIF_table.features)
+    df =df.drop(columns = VIF_list[0]) #drop highest VIF factor column 
+    return df
 
 def get_train_test(df_datasets, join=None, on=None):
     df_datasets.train_datas = list()
@@ -345,13 +350,13 @@ def label_encoder(df):  # 컬럼명 리스트 기준으로 레이블인코딩
 
 def get_under_samples(df, rate):
     # Find Number of samples which are Fraud
-    non_frauds = len(df[df['id_col'] == 1]) * n  # 열 배
+    non_frauds = len(df[df['id_col'] == 1]) * rate  # 열 배
 
     # Get indices of non fraud samples
     non_fraud_indices = df[df.id_col == 0].index
 
     # Random sample non fraud indices
-    random_indices = np.random.choice(non_fraud_indices, no_frauds, replace=False)
+    random_indices = np.random.choice(non_fraud_indices, non_frauds, replace=False)
 
     # Find the indices of fraud samples
     fraud_indices = df[df.isFraud == 1].index
@@ -387,10 +392,7 @@ def main(datasets):
 
     # Calcutate VIF
     for df in vars(df_datasets).keys():
-        get_vif_table(getattr(df_datasets, df))
-
-    # # TODO: Apply VIF?
-    # apply_VIF()
+        process_VIF(getattr(df_datasets, df))
 
     # PCA
     for df in vars(df_datasets).keys():
