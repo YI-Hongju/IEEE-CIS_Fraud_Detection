@@ -74,14 +74,14 @@ def XGB():
         )
 
     xgb_clf.fit(X_train, y_train, eval_metric="auc", eval_set=[(X_val, y_val)], verbose = 3)
-    pred = xgb_clf.predict(X_val)
-    pred_proba = xgb_clf.predict_proba(X_val)[:1]
+    xgb_pred = xgb_clf.predict(X_val)
+    xgb_pred_proba = xgb_clf.predict_proba(X_val)[:1]
 
     fig, ax = plt.subplots(figsize=(10,10))
     plot_importance(xgb_clf, ax=ax, max_num_features=50, height=0.4)
     plt.show()
 
-    get_clf_eval(y_val, pred)
+    get_clf_eval(y_val, xgb_pred)
 
 # Running LightGBM
 def LGB():
@@ -93,14 +93,14 @@ def LGB():
     )
 
     lgb_clf.fit(X_train, y_train, eval_metric='auc', eval_set=[(X_val, y_val)], verbose = 3)
-    pred = lgb_clf.predict(X_val)
-    pred_proba = lgb_clf.predict_proba(X_val)[:1]
+    lgb_pred = lgb_clf.predict(X_val)
+    lgb_pred_proba = lgb_clf.predict_proba(X_val)[:1]
 
     fig, ax = plt.subplots(figsize=(10,10))
     plot_importance(lgb_clf, ax=ax, max_num_features=50, height=0.4)
     plt.show()
 
-    get_clf_eval(y_val, pred)
+    get_clf_eval(y_val, lgb_pred)
 
 # Running CatBoost
 def CAT():
@@ -114,7 +114,12 @@ def CAT():
         )
 
     cat_clf.fit(X_train, y_train, eval_set=(X_val, y_val), verbose = 3)
-    pred = cat_clf.predict(X_val)
-    pred_proba = cat_clf.predict_proba(X_val)[:1]
+    cat_pred = cat_clf.predict(X_val)
+    cat_pred_proba = cat_clf.predict_proba(X_val)[:1]
 
-    get_clf_eval(y_val, pred)
+    get_clf_eval(y_val, cat_pred)
+
+# Main
+def main():
+    max_scored_model = 
+    print('Max AUC score : 'max(roc_auc_score(y_val, xgb_pred),roc_auc_score(y_val, lgb_pred),roc_auc_score(y_val, cat_pred)))
