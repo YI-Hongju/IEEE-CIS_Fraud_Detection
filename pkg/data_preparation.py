@@ -7,6 +7,10 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import LabelEncoder
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 
+from sklearn.model_selection import train_test_split
+
+
+
 def get_df(datasets, is_only=None, join=None):
     #데이터 로드 as dataframe & 간략한 정보
 
@@ -401,6 +405,13 @@ def reduce_mem_usage(df, verbose=True):
 
 
 
+def custom_train_test_split(df_datasets):
+    df_datasets.test = df_datasets.t ......................
+    df_datasets.train = df_datasets.train.drop('isFraud', axis=1)
+
+    df_datasets.X_train, df_datasets.X_val, df_datasets.y_train, df_datasets.y_val = train_test_split(
+        df_datasets.train
+    )
 
 def main(datasets):
     # Get datasets from data/
@@ -445,17 +456,13 @@ def main(datasets):
     # drops = recommand_drop_cols [예시 코드]
     # drop_col_train_test(df_datasets, drops)
 
-    # # TODO: Under-samping
+    # # TODO when rests: Under-samping
     # get_under_samples(df, rate)
 
     # Scaling
-    # TODO: TODO: optioned_scaler
+    # TODO: optioned_scaler
 
     # TODO: Set train, validation data
-    X_train, X_val, y_train, y_val = train_test_split(
-        df_datasets, y_target, test_size=0.3, random_state=156
-    )
-
-    # TODO: Get Train/Validation
+    custom_train_test_split(df_datasets)
 
     return df_datasets
