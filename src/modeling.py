@@ -1,3 +1,8 @@
+import pandas as pd
+import numpy as np
+import matplotlib as plt
+import seaborn as sns
+
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split, GridSearchCV, KFold
@@ -73,7 +78,7 @@ def XGB():
     pred_proba = xgb_clf.predict_proba(X_val)[:1]
 
     fig, ax = plt.subplots(figsize=(10,10))
-    plot_importance(lgb_clf, ax=ax, max_num_features=50, height=0.4)
+    plot_importance(xgb_clf, ax=ax, max_num_features=50, height=0.4)
     plt.show()
 
     get_clf_eval(y_val, pred)
