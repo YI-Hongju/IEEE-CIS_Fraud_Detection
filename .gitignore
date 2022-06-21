@@ -12,7 +12,19 @@ data/
 
 # Python
 __pycache__/
+test.py
+test.ipynb
 
+<<<<<<< HEAD
 # Temporary
 tmp_*.ipynb
->>>>>>> dfd8fc0 (Add tmp_*.ipynb files to ignore-list)
+=======
+# Temporary files
+tmp_*.ipynb
+
+# Member's codes for Merging
+MemberCodes/
+
+# h2o 7333...............
+h2o_0613.ipynb
+>>>>>>> upstream/main
